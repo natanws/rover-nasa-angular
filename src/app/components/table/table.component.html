@@ -1,0 +1,29 @@
+<div>
+    <form>
+        <div>
+            <mat-form-field appearance="fill" class="inputContainer">
+                <mat-label>Dimensões (X Y)</mat-label>
+                <input placeholder="5 5" name="dimensions" [(ngModel)]="newCommands.boardDimensions" matInput required>
+            </mat-form-field>
+            <mat-form-field appearance="fill" class="inputContainer">
+                <mat-label>Posição inicial (X Y Orientação)</mat-label>
+                <input placeholder="1 3 N" name="initialPosition" [(ngModel)]="newCommands.startingPosition" matInput required>
+            </mat-form-field>
+            <mat-form-field appearance="fill" class="inputContainer">
+                <mat-label>Lista de comandos (L/R/M)</mat-label>
+                <input placeholder="LMRMRMLM" name="pathing" [(ngModel)]="newCommands.pathing" matInput required>
+            </mat-form-field>
+        </div>
+        <button (click)="roverMovement()" (contextmenu)="$event.preventDefault()">Enviar comandos</button>
+    </form>
+
+    <table *ngIf="displayBoard">
+        <tr *ngFor="let cell of board">
+            <td *ngFor="let value of cell">
+                <img *ngIf="['N', 'W', 'S', 'E'].includes(value)" src="{{roverImage}}" alt="{{value}} rover" class="rover {{value}}">
+                <span *ngIf="!['N', 'W', 'S', 'E'].includes(value)">{{value}}</span>
+            </td>
+        </tr>
+    </table>
+    <span *ngIf="displayBoard">Posição final: {{position.x}} {{position.y}} {{position.orientation}}</span>
+</div>
