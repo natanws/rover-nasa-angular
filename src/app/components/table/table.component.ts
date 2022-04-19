@@ -20,7 +20,7 @@ export class TableComponent implements OnInit {
   newCommands: {
     boardDimensions: string;
     startingPosition: string;
-    pathing: string;
+    pathing: any;
   } = {
     boardDimensions: "",
     startingPosition: "",
@@ -44,64 +44,55 @@ export class TableComponent implements OnInit {
     this.board[boardSize[1] - position.y][position.x] = position.orientation;
   };
 
-  rotationControl = (
-    position: Position,
-    rotation: string,
-    boardArray: number[]
-  ) => {
-    if (rotation === "M") {
-      switch (position.orientation) {
+  rotationControl = {
+    L: function Left(orientation: string, position: Position) {
+      switch (orientation) {
         case "N":
-          position.y < boardArray[1] ? (position.y += 1) : position.y;
+          position.orientation = "W";
           break;
         case "W":
-          position.x > 0 ? (position.x -= 1) : position.x;
+          position.orientation = "S";
           break;
         case "S":
-          position.y > 0 ? (position.y -= 1) : position.y;
+          position.orientation = "E";
           break;
         case "E":
-          position.x < boardArray[0] ? (position.x += 1) : position.x;
-          break;
-      }
-    }
-    if (position.orientation === "N") {
-      switch (rotation) {
-        case "L":
-          position.orientation = "W";
-          break;
-        case "R":
-          position.orientation = "E";
-          break;
-      }
-    } else if (position.orientation === "W") {
-      switch (rotation) {
-        case "L":
-          position.orientation = "S";
-          break;
-        case "R":
           position.orientation = "N";
           break;
       }
-    } else if (position.orientation === "S") {
-      switch (rotation) {
-        case "L":
+    },
+    R: function Right(orientation: string, position: Position) {
+      switch (orientation) {
+        case "N":
           position.orientation = "E";
           break;
-        case "R":
-          position.orientation = "W";
-          break;
-      }
-    } else if (position.orientation === "E") {
-      switch (rotation) {
-        case "L":
+        case "W":
           position.orientation = "N";
           break;
-        case "R":
+        case "S":
+          position.orientation = "W";
+          break;
+        case "E":
           position.orientation = "S";
           break;
       }
-    }
+    },
+    M: function Move(orientation: string, position: Position) {
+      switch (orientation) {
+        case "N":
+          position.y++;
+          break;
+        case "W":
+          position.x--;
+          break;
+        case "S":
+          position.y--;
+          break;
+        case "E":
+          position.x++;
+          break;
+      }
+    },
   };
 
   roverMovement = () => {
@@ -121,15 +112,16 @@ export class TableComponent implements OnInit {
 
     this.updateBoard(boardArray, this.position);
 
-    for (let order = 0; order < this.newCommands.pathing.length; order++) {
+    for (let order in this.newCommands.pathing) {
+      let currentOrder: keyof typeof this.rotationControl =
+        this.newCommands.pathing[order];
       setTimeout(() => {
-        this.rotationControl(
-          this.position,
-          this.newCommands.pathing[order],
-          boardArray
+        this.rotationControl[currentOrder](
+          this.position.orientation,
+          this.position
         );
         this.updateBoard(boardArray, this.position);
-      }, 1000 + 500 * order);
+      }, 1000 + 300 * +order);
     }
     if (this.board.length > 0) {
       this.displayBoard = true;
